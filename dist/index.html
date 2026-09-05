@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#dff6b9">
+  <meta name="description" content="A friendly, touch-ready kanji practice app for young learners.">
+  <meta property="og:title" content="Kanji Garden">
+  <meta property="og:description" content="Write • Learn • Grow! A touch-ready kanji practice garden for young learners.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kanji-garden-182.still-melon-5189.chatgpt.site">
+  <meta property="og:image" content="https://kanji-garden-182.still-melon-5189.chatgpt.site/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kanji Garden">
+  <meta name="twitter:description" content="Write • Learn • Grow! A touch-ready kanji practice garden for young learners.">
+  <meta name="twitter:image" content="https://kanji-garden-182.still-melon-5189.chatgpt.site/og.png">
+  <title>Kanji Garden</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <label class="grade-picker">Level <select aria-label="Learning level"><option>Starter 182</option></select></label>
+    <div class="brand"><h1>Kanji Garden</h1><p>Write <span>•</span> Learn <span>•</span> Grow!</p></div>
+    <div class="header-actions"><button id="soundToggle" class="icon-button" aria-label="Toggle sound">🔊<small>Sound</small></button><button id="helpButton" class="icon-button" aria-label="Open help">?<small>Help</small></button></div>
+  </header>
+
+  <nav class="tabs" aria-label="Learning areas">
+    <button class="tab active" data-view="practice"><b>✎</b><span>Practice<small>Write & Learn</small></span></button>
+    <button class="tab" data-view="read"><b>▣</b><span>Read<small>Readings & Meaning</small></span></button>
+    <button class="tab" data-view="test"><b>✓</b><span>Test<small>Check Your Skills</small></span></button>
+    <button class="tab" data-view="collection"><b>★</b><span>Collection<small>My Kanji</small></span></button>
+    <button class="tab" data-view="progress"><b>▥</b><span>Progress<small>See Your Growth</small></span></button>
+  </nav>
+
+  <main>
+    <section id="practiceView" class="view active" aria-labelledby="practiceTitle">
+      <div class="practice-toolbar">
+        <div class="previous-next"><button id="previousKanji" aria-label="Previous kanji">‹</button><button id="nextKanjiTop" aria-label="Next kanji">›</button></div>
+        <h2 id="practiceTitle"><span id="practicePosition">1 / 182</span><small id="practiceStatus">Not started</small></h2>
+        <button id="pronounceButton" class="soft-button">🔊 <span>Play Pronunciation</span></button>
+      </div>
+
+      <div class="practice-layout">
+        <div class="board-card">
+          <div id="drawingBoard" class="drawing-board trace-mode">
+            <div class="guide-lines" aria-hidden="true"></div>
+            <div id="kanjiGuide" class="kanji-guide" aria-hidden="true">四</div>
+            <canvas id="practiceCanvas" aria-label="Draw the kanji here"></canvas>
+            <div id="strokeNotice" class="stroke-notice">Trace the pale kanji</div>
+          </div>
+          <div class="board-actions">
+            <button id="clearCanvas" class="secondary">↻ Clear</button>
+            <button id="tryAgain" class="secondary">✨ Try Again</button>
+            <button id="markLearned" class="learned-button">✓ Mark Learned</button>
+          </div>
+        </div>
+
+        <aside class="info-card" aria-label="Kanji information">
+          <div class="info-hero"><span id="infoKanji">四</span><strong id="infoMeaning">four</strong></div>
+          <dl>
+            <div><dt>Onyomi</dt><dd><span id="infoOnyomi">シ</span><em id="infoOnRomaji">shi</em></dd></div>
+            <div><dt>Kunyomi</dt><dd><span id="infoKunyomi">よん、よ、よっ</span><em id="infoKunRomaji">yon, yo, yottsu</em></dd></div>
+            <div><dt>Meaning</dt><dd id="infoMeaningLong">four</dd></div>
+            <div><dt>Examples</dt><dd id="infoExamples">四月 — April</dd></div>
+            <div class="small-pair"><span><dt>Stroke count</dt><dd id="infoStrokes">5</dd></span><span><dt>Radical</dt><dd id="infoRadical">囗</dd></span></div>
+            <div id="descriptionRow" hidden><dt>About</dt><dd id="infoDescription"></dd></div>
+          </dl>
+        </aside>
+      </div>
+
+      <div class="practice-controls">
+        <img src="assets/pig-mascot.svg" class="mascot" alt="A cheerful pink pig says you can do it">
+        <div class="mode-grid">
+          <button id="watchStrokes" class="mode-button"><b>▶</b><span>Watch<small>Stroke order</small></span></button>
+          <button id="traceMode" class="mode-button active"><b>✎</b><span>Trace<small>Follow the guide</small></span></button>
+          <button id="freeMode" class="mode-button"><b>✎</b><span>Write Freely<small>Without guide</small></span></button>
+          <div class="repetitions"><strong>Number of Traces</strong><div><button data-repeat="3">3 times</button><button class="active" data-repeat="5">5 times</button><button data-repeat="10">10 times</button></div></div>
+          <button id="nextKanji" class="next-button">Next <span>›</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="readView" class="view lesson-view" aria-labelledby="readTitle">
+      <div class="lesson-card"><p class="eyebrow">READING QUIZ</p><h2 id="readTitle">How do you read this kanji?</h2><div id="readKanji" class="quiz-kanji">四</div><p id="readHint" class="quiz-hint">Meaning: four</p><div id="readChoices" class="choice-grid"></div><p id="readFeedback" class="feedback" aria-live="polite"></p><button id="nextRead" class="next-button">Next question ›</button></div>
+    </section>
+
+    <section id="testView" class="view lesson-view" aria-labelledby="testTitle">
+      <div class="lesson-card"><p class="eyebrow">MIXED CHALLENGE</p><div class="test-heading"><h2 id="testTitle">Choose the answer</h2><span id="testScore">Score 0 / 0</span></div><p id="testPrompt" class="test-prompt"></p><div id="testChoices" class="choice-grid"></div><div id="testWriting" class="mini-writing" hidden><canvas aria-label="Write your answer here"></canvas><button class="secondary" id="clearTestCanvas">Clear</button></div><p id="testFeedback" class="feedback" aria-live="polite"></p><button id="nextTest" class="next-button">Next question ›</button></div>
+    </section>
+
+    <section id="collectionView" class="view" aria-labelledby="collectionTitle">
+      <div class="section-heading"><div><p class="eyebrow">MY KANJI</p><h2 id="collectionTitle">Collection</h2></div><div class="filters"><input id="collectionSearch" type="search" placeholder="Search kanji or meaning" aria-label="Search collection"><select id="collectionFilter" aria-label="Filter collection"><option value="all">All</option><option value="learned">Learned</option><option value="practicing">Practicing</option><option value="new">Not started</option></select></div></div>
+      <div id="collectionGrid" class="collection-grid"></div>
+    </section>
+
+    <section id="progressView" class="view" aria-labelledby="progressTitle">
+      <div class="section-heading"><div><p class="eyebrow">YOUR GROWTH</p><h2 id="progressTitle">Progress</h2></div></div>
+      <div class="stats-grid"><article><b id="completedCount">0</b><span>Completed</span><small>of 182 kanji</small></article><article><b id="practiceCount">0</b><span>Total practices</span><small>keep it up!</small></article><article><b id="progressPercent">0%</b><span>Learning progress</span><small id="progressEncouragement">Start with one!</small></article></div>
+      <div class="progress-card"><div class="progress-ring" id="progressRing"><span>0%</span></div><div><h3>Garden progress</h3><p>Every practiced kanji helps your garden grow.</p><div class="bar"><i id="progressBar"></i></div></div></div>
+      <div class="history-grid"><article><h3>Recently practiced</h3><div id="recentList" class="kanji-row"><span class="empty">No practice yet</span></div></article><article><h3>Needs more practice</h3><div id="needsPracticeList" class="kanji-row"><span class="empty">Practice a kanji to see it here</span></div></article></div>
+    </section>
+  </main>
+
+  <dialog id="helpDialog"><button id="closeHelp" aria-label="Close help">×</button><h2>How to use Kanji Garden</h2><ol><li>Look at the pale kanji.</li><li>Trace it with your finger or mouse.</li><li>Try writing it without the guide.</li><li>Mark it learned when you feel ready.</li></ol><p>Stroke-order animation appears only when verified stroke data is available.</p></dialog>
+
+  <script src="kanji-data.js"></script>
+  <script src="progress.js"></script>
+  <script src="tracing.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

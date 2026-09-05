@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 245" role="img" aria-labelledby="title desc">
+  <title id="title">Cheering pig mascot</title><desc id="desc">A happy pink pig in a straw hat giving a thumbs up.</desc>
+  <path d="M42 58C18 44 7 25 7 25c28 4 47 18 57 35" fill="#ffe879" stroke="#17213b" stroke-width="7" stroke-linecap="round"/>
+  <path d="M48 155c-35 7-43 48-21 75 20 24 71 13 78-16" fill="#f78fa9" stroke="#17213b" stroke-width="7"/>
+  <path d="M54 131 30 99l42 9M173 124l39-22-9 45" fill="#f78fa9" stroke="#17213b" stroke-width="7" stroke-linejoin="round"/>
+  <ellipse cx="119" cy="151" rx="75" ry="67" fill="#fa91aa" stroke="#17213b" stroke-width="7"/>
+  <path d="M71 119c17-27 74-48 113-9" fill="none" stroke="#17213b" stroke-width="8"/>
+  <path d="m42 91 122-53 44 34-136 53z" fill="#ffe56d" stroke="#17213b" stroke-width="7" stroke-linejoin="round"/>
+  <path d="m89 70 11-35 51 4 20 21" fill="#f8cf54" stroke="#17213b" stroke-width="7"/>
+  <path d="m85 72 80-33 15 14-82 35z" fill="#596060" stroke="#17213b" stroke-width="5"/>
+  <circle cx="87" cy="144" r="7" fill="#17213b"/><circle cx="150" cy="139" r="7" fill="#17213b"/>
+  <ellipse cx="120" cy="173" rx="35" ry="25" fill="#ffc0cd" stroke="#17213b" stroke-width="6"/><ellipse cx="108" cy="172" rx="4" ry="8" fill="#17213b"/><ellipse cx="133" cy="172" rx="4" ry="8" fill="#17213b"/>
+  <path d="M184 166c15 4 20 16 9 26-5 5-16 2-16-5 3 22 25 30 39 15 8-9 5-22-5-27" fill="#f78fa9" stroke="#17213b" stroke-width="7" stroke-linecap="round"/>
+  <path d="M216 177c6-2 12-10 10-18-1-7-8-9-13-4-3-8-13-9-17-1-4 8 5 18 15 22" fill="#ffc0cd" stroke="#17213b" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M69 205c23 11 63 15 88 1" fill="none" stroke="#17213b" stroke-width="7" stroke-linecap="round"/>
+  <g transform="translate(2 0)"><path d="M13 8h117a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H56L37 91l3-19H13A14 14 0 0 1-1 58V22A14 14 0 0 1 13 8Z" fill="white" opacity=".96"/><text x="19" y="34" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#17213b">You can</text><text x="31" y="58" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#17213b">do it!</text></g>
+</svg>
