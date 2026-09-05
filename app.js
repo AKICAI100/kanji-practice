@@ -8,7 +8,7 @@
   let readIndex = 0, testIndex = 0, testAnswered = false, readAnswered = false;
   const board = $('#drawingBoard');
   const drawing = window.KanjiDrawing.createDrawingSurface($('#practiceCanvas'), () => {
-    strokesThisKanji += 1; progress.recordPractice(data[index].kanji); updateStatus();
+    strokesThisKanji += 1;
   });
   const testDrawing = window.KanjiDrawing.createDrawingSurface($('#testWriting canvas'));
 
@@ -33,8 +33,16 @@
     $('#descriptionRow').hidden = !item.description; $('#infoDescription').textContent = item.description;
     $('#previousKanji').disabled = index === 0; updateStatus();
   }
-  function moveKanji(delta) { index = (index + delta + data.length) % data.length; renderPractice(); }
+  function completePracticeRound() {
+    if (!strokesThisKanji) return false;
+    progress.recordPractice(data[index].kanji);
+    strokesThisKanji = 0;
+    updateStatus();
+    return true;
+  }
+  function moveKanji(delta) { completePracticeRound(); index = (index + delta + data.length) % data.length; renderPractice(); }
   function setMode(next) {
+    completePracticeRound();
     mode = next; board.classList.toggle('trace-mode', mode === 'trace'); board.classList.toggle('free-mode', mode === 'free');
     $('#traceMode').classList.toggle('active', mode === 'trace'); $('#freeMode').classList.toggle('active', mode === 'free');
     $('#strokeNotice').textContent = mode === 'trace' ? 'Trace the pale kanji' : 'Write it by yourself'; drawing.clear();
@@ -86,10 +94,10 @@
 
   $$('.tab').forEach(t => t.onclick = () => showView(t.dataset.view));
   $('#previousKanji').onclick = () => moveKanji(-1); $('#nextKanjiTop').onclick = $('#nextKanji').onclick = () => moveKanji(1);
-  $('#clearCanvas').onclick = () => drawing.clear(); $('#tryAgain').onclick = () => { drawing.clear(); strokesThisKanji = 0; progress.recordPractice(data[index].kanji); updateStatus(); };
+  $('#clearCanvas').onclick = () => { drawing.clear(); strokesThisKanji = 0; }; $('#tryAgain').onclick = () => { completePracticeRound(); drawing.clear(); };
   $('#traceMode').onclick = () => setMode('trace'); $('#freeMode').onclick = () => setMode('free');
   $('#watchStrokes').onclick = () => { $('#strokeNotice').textContent = 'Verified stroke order is not available yet'; $('#strokeNotice').classList.add('notice'); setTimeout(() => { $('#strokeNotice').classList.remove('notice'); $('#strokeNotice').textContent = mode === 'trace' ? 'Trace the pale kanji' : 'Write it by yourself'; }, 2500); };
-  $('#markLearned').onclick = () => { progress.toggleLearned(data[index].kanji); updateStatus(); };
+  $('#markLearned').onclick = () => { completePracticeRound(); progress.toggleLearned(data[index].kanji); updateStatus(); };
   $$('.repetitions button').forEach(b => b.onclick = () => { repeatTarget = Number(b.dataset.repeat); $$('.repetitions button').forEach(x => x.classList.toggle('active', x === b)); $('#strokeNotice').textContent = `Goal: ${repeatTarget} tracing rounds`; });
   $('#pronounceButton').onclick = () => speak(data[index]); $('#soundToggle').onclick = () => { soundEnabled = !soundEnabled; $('#soundToggle').firstChild.textContent = soundEnabled ? '🔊' : '🔇'; };
   $('#helpButton').onclick = () => $('#helpDialog').showModal(); $('#closeHelp').onclick = () => $('#helpDialog').close();
@@ -104,7 +112,10 @@
       description: 'Marks the kanji currently open in Practice as learned and updates Collection and Progress.',
       inputSchema: { type: 'object', properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: false, untrustedContentHint: false },
-      execute() {
+      execute(input) {
+        if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).length) {
+          throw new TypeError('This tool does not accept input fields.');
+        }
         const item = data[index];
         if (!progress.getItem(item.kanji).learned) progress.toggleLearned(item.kanji);
         updateStatus();
