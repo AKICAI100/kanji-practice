@@ -33,11 +33,31 @@
   </nav>
 
   <main>
+    <section id="homeView" class="view home-view" aria-labelledby="homeTitle">
+      <div class="home-card">
+        <img src="assets/pig-mascot.svg" class="home-mascot" alt="A cheerful pink pig says you can do it">
+        <div class="home-copy"><p class="eyebrow">WRITE • LEARN • GROW!</p><h2 id="homeTitle">Kanji Garden</h2><p>Choose an activity and grow your kanji skills.</p></div>
+        <div class="home-actions">
+          <button class="home-action primary" data-view="practice"><b>✎</b><span>Practice<small>Write & Learn</small></span></button>
+          <button class="home-action" data-view="read"><b>▣</b><span>Read<small>Readings & Meaning</small></span></button>
+          <button class="home-action" data-view="test"><b>✓</b><span>Test<small>Check Your Skills</small></span></button>
+          <button class="home-action" data-view="collection"><b>★</b><span>Collection<small>My Kanji</small></span></button>
+          <button class="home-action" data-view="progress"><b>▥</b><span>Progress<small>See Your Growth</small></span></button>
+        </div>
+      </div>
+    </section>
+
     <section id="practiceView" class="view active" aria-labelledby="practiceTitle">
       <div class="practice-toolbar">
-        <div class="previous-next"><button id="previousKanji" aria-label="Previous kanji">‹</button><button id="nextKanjiTop" aria-label="Next kanji">›</button></div>
-        <h2 id="practiceTitle"><span id="practicePosition">1 / 182</span><small id="practiceStatus">Not started</small></h2>
+        <button id="homeButton" class="home-button" aria-label="Go to home">⌂ <span>Home</span></button>
+        <div class="previous-next"><button id="previousKanji" aria-label="Previous kanji">‹ <span>Previous</span></button><h2 id="practiceTitle"><span id="practicePosition">1 / 182</span></h2><button id="nextKanjiTop" aria-label="Next kanji"><span>Next</span> ›</button></div>
         <button id="pronounceButton" class="soft-button">🔊 <span>Play Pronunciation</span></button>
+      </div>
+
+      <div class="practice-mode-bar" role="group" aria-label="Writing mode">
+        <button id="traceMode" class="active" aria-pressed="true">Trace</button>
+        <button id="guidedMode" aria-pressed="false">Guided Strokes</button>
+        <button id="freeMode" aria-pressed="false">Write Freely</button>
       </div>
 
       <div class="practice-layout">
@@ -45,6 +65,7 @@
           <div id="drawingBoard" class="drawing-board trace-mode">
             <div class="guide-lines" aria-hidden="true"></div>
             <div id="kanjiGuide" class="kanji-guide" aria-hidden="true">四</div>
+            <svg id="guidedStrokeGuide" class="guided-stroke-guide" viewBox="0 0 109 109" aria-hidden="true"></svg>
             <canvas id="practiceCanvas" aria-label="Draw the kanji here"></canvas>
             <div id="strokeNotice" class="stroke-notice">Trace the pale kanji</div>
           </div>
@@ -69,15 +90,13 @@
       </div>
 
       <div class="practice-controls">
-        <img src="assets/pig-mascot.svg" class="mascot" alt="A cheerful pink pig says you can do it">
-        <div class="mode-grid">
-          <button id="watchStrokes" class="mode-button"><b>▶</b><span>Watch<small>Stroke order</small></span></button>
-          <button id="traceMode" class="mode-button active"><b>✎</b><span>Trace<small>Follow the guide</small></span></button>
-          <button id="freeMode" class="mode-button"><b>✎</b><span>Write Freely<small>Without guide</small></span></button>
-          <div class="repetitions"><strong>Number of Traces</strong><div><button data-repeat="3">3 times</button><button class="active" data-repeat="5">5 times</button><button data-repeat="10">10 times</button></div></div>
-          <button id="nextKanji" class="next-button">Next <span>›</span></button>
-        </div>
+        <small id="practiceStatus">Not started</small>
+        <button id="nextKanji" class="next-button">Next <span>›</span></button>
       </div>
+
+      <nav class="practice-secondary-nav" aria-label="More learning areas">
+        <button data-view="read">▣ Read</button><button data-view="test">✓ Test</button><button data-view="collection">★ Collection</button><button data-view="progress">▥ Progress</button>
+      </nav>
     </section>
 
     <section id="readView" class="view lesson-view" aria-labelledby="readTitle">
