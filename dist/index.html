@@ -56,7 +56,7 @@
     <section id="practiceView" class="view active" aria-labelledby="practiceTitle">
       <div class="practice-toolbar">
         <button id="homeButton" class="home-button" aria-label="Go to home">⌂ <span>Home</span></button>
-        <div class="previous-next"><button id="previousKanji" aria-label="Previous kanji">‹ <span>Previous</span></button><h2 id="practiceTitle"><span id="practicePosition">1 / 182</span></h2><button id="nextKanjiTop" aria-label="Next kanji"><span>Next</span> ›</button></div>
+        <div class="previous-next"><button id="previousKanji" aria-label="Previous kanji">‹ <span>Previous</span></button><h2 id="practiceTitle"><button id="practicePosition" class="position-button" aria-label="Jump to a kanji" aria-haspopup="dialog">1 / —</button></h2><button id="nextKanjiTop" aria-label="Next kanji"><span>Next</span> ›</button></div>
         <button id="pronounceButton" class="soft-button">🔊 <span>Play Pronunciation</span></button>
       </div>
 
@@ -121,11 +121,18 @@
 
     <section id="progressView" class="view" aria-labelledby="progressTitle">
       <div class="section-heading"><div><p class="eyebrow">YOUR GROWTH</p><h2 id="progressTitle">Progress</h2></div></div>
-      <div class="stats-grid"><article><b id="completedCount">0</b><span>Completed</span><small>of 182 kanji</small></article><article><b id="practiceCount">0</b><span>Total practices</span><small>keep it up!</small></article><article><b id="progressPercent">0%</b><span>Learning progress</span><small id="progressEncouragement">Start with one!</small></article></div>
+      <div class="stats-grid"><article><b id="completedCount">0</b><span>Completed</span><small>of <span id="totalKanjiCount">—</span> kanji</small></article><article><b id="practiceCount">0</b><span>Total practices</span><small>keep it up!</small></article><article><b id="progressPercent">0%</b><span>Learning progress</span><small id="progressEncouragement">Start with one!</small></article></div>
       <div class="progress-card"><div class="progress-ring" id="progressRing"><span>0%</span></div><div><h3>Garden progress</h3><p>Every practiced kanji helps your garden grow.</p><div class="bar"><i id="progressBar"></i></div></div></div>
       <div class="history-grid"><article><h3>Recently practiced</h3><div id="recentList" class="kanji-row"><span class="empty">No practice yet</span></div></article><article><h3>Needs more practice</h3><div id="needsPracticeList" class="kanji-row"><span class="empty">Practice a kanji to see it here</span></div></article></div>
     </section>
   </main>
+
+  <dialog id="jumpDialog" class="jump-dialog" aria-labelledby="jumpTitle">
+    <button id="closeJump" aria-label="Close jump panel">×</button>
+    <h2 id="jumpTitle">Jump to a kanji</h2>
+    <div id="jumpRanges" class="jump-ranges" aria-label="Kanji ranges"></div>
+    <div id="jumpGrid" class="jump-grid" aria-label="Kanji in selected range"></div>
+  </dialog>
 
   <dialog id="helpDialog"><button id="closeHelp" aria-label="Close help">×</button><h2>How to use Kanji Garden</h2><ol><li>Look at the pale kanji.</li><li>Trace it with your finger or mouse.</li><li>Try writing it without the guide.</li><li>Mark it learned when you feel ready.</li></ol><p>Stroke-order animation appears only when verified stroke data is available.</p></dialog>
 

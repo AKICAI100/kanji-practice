@@ -4,7 +4,17 @@
   const progress = window.KanjiGardenProgress;
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  let index = 0, mode = 'trace', strokesThisKanji = 0, soundEnabled = true, currentStroke = 0;
+  const LAST_POSITION_KEY = 'kanjiGardenLastPosition.v1';
+  function loadLastIndex() {
+    try {
+      const saved = Number.parseInt(localStorage.getItem(LAST_POSITION_KEY), 10);
+      return Number.isInteger(saved) && saved >= 0 && saved < data.length ? saved : 0;
+    } catch (_) { return 0; }
+  }
+  function saveLastIndex() {
+    try { localStorage.setItem(LAST_POSITION_KEY, String(index)); } catch (_) {}
+  }
+  let index = loadLastIndex(), mode = 'trace', strokesThisKanji = 0, soundEnabled = true, currentStroke = 0;
   let readIndex = 0, testIndex = 0, testAnswered = false, readAnswered = false;
   const board = $('#drawingBoard');
   const drawing = window.KanjiDrawing.createDrawingSurface($('#practiceCanvas'), () => {
@@ -45,6 +55,7 @@
   function renderPractice(clear = true) {
     const item = data[index];
     if (clear) drawing.clear(); strokesThisKanji = 0;
+    saveLastIndex();
     $('#practicePosition').textContent = `${index + 1} / ${data.length}`;
     $('#kanjiGuide').textContent = item.kanji; $('#infoKanji').textContent = item.kanji;
     currentStroke = 0; renderGuidedGuide(item);
@@ -64,6 +75,34 @@
     return true;
   }
   function moveKanji(delta) { completePracticeRound(); index = (index + delta + data.length) % data.length; renderPractice(); }
+  function jumpRangeSize(total) {
+    const desiredRangeCount = Math.max(1, Math.ceil(total / 50));
+    return Math.max(10, Math.ceil(total / desiredRangeCount / 10) * 10);
+  }
+  function renderJumpRange(start, rangeSize) {
+    const end = Math.min(start + rangeSize, data.length);
+    const grid = $('#jumpGrid'); grid.replaceChildren();
+    for (let itemIndex = start; itemIndex < end; itemIndex += 1) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.dataset.index = String(itemIndex);
+      button.setAttribute('aria-label', `${itemIndex + 1}: ${data[itemIndex].kanji}`);
+      button.innerHTML = `<small>${itemIndex + 1}</small><b>${data[itemIndex].kanji}</b>`;
+      button.onclick = () => { completePracticeRound(); index = itemIndex; renderPractice(); $('#jumpDialog').close(); };
+      grid.append(button);
+    }
+    $$('#jumpRanges button').forEach(button => button.classList.toggle('active', Number(button.dataset.start) === start));
+  }
+  function openJumpPanel() {
+    const rangeSize = jumpRangeSize(data.length), ranges = $('#jumpRanges');
+    ranges.replaceChildren();
+    for (let start = 0; start < data.length; start += rangeSize) {
+      const end = Math.min(start + rangeSize, data.length), button = document.createElement('button');
+      button.type = 'button'; button.dataset.start = String(start); button.textContent = `${start + 1}–${end}`;
+      button.onclick = () => renderJumpRange(start, rangeSize); ranges.append(button);
+    }
+    renderJumpRange(Math.floor(index / rangeSize) * rangeSize, rangeSize);
+    $('#jumpDialog').showModal();
+  }
   function setMode(next) {
     completePracticeRound();
     mode = next; currentStroke = 0;
@@ -113,7 +152,7 @@
   }
   function renderProgress() {
     const state = progress.getState(), learned = data.filter(item => progress.getItem(item.kanji).learned), practicing = data.filter(item => { const p = progress.getItem(item.kanji); return p.practices && !p.learned; }).sort((a,b) => progress.getItem(a.kanji).practices - progress.getItem(b.kanji).practices); const percent = Math.round(learned.length / data.length * 100);
-    $('#completedCount').textContent = learned.length; $('#practiceCount').textContent = state.totalPractices; $('#progressPercent').textContent = `${percent}%`; $('#progressEncouragement').textContent = percent ? 'Growing strong!' : 'Start with one!'; $('#progressBar').style.width = `${percent}%`; $('#progressRing').style.setProperty('--progress', `${percent * 3.6}deg`); $('#progressRing span').textContent = `${percent}%`;
+    $('#completedCount').textContent = learned.length; $('#totalKanjiCount').textContent = data.length; $('#practiceCount').textContent = state.totalPractices; $('#progressPercent').textContent = `${percent}%`; $('#progressEncouragement').textContent = percent ? 'Growing strong!' : 'Start with one!'; $('#progressBar').style.width = `${percent}%`; $('#progressRing').style.setProperty('--progress', `${percent * 3.6}deg`); $('#progressRing span').textContent = `${percent}%`;
     $('#recentList').innerHTML = state.recent.length ? state.recent.slice(0,8).map(k => `<button data-kanji="${k}">${k}</button>`).join('') : '<span class="empty">No practice yet</span>';
     $('#needsPracticeList').innerHTML = practicing.length ? practicing.slice(0,8).map(x => `<button data-kanji="${x.kanji}">${x.kanji}</button>`).join('') : '<span class="empty">Practice a kanji to see it here</span>';
     $$('.kanji-row button').forEach(button => button.onclick = () => { index = data.findIndex(x => x.kanji === button.dataset.kanji); renderPractice(); showView('practice'); });
@@ -121,6 +160,7 @@
 
   $$('[data-view]').forEach(t => t.onclick = () => showView(t.dataset.view));
   $('#homeButton').onclick = () => showView('home');
+  $('#practicePosition').onclick = openJumpPanel; $('#closeJump').onclick = () => $('#jumpDialog').close();
   $('#previousKanji').onclick = () => moveKanji(-1); $('#nextKanjiTop').onclick = $('#nextKanji').onclick = () => moveKanji(1);
   $('#clearCanvas').onclick = () => { drawing.clear(); strokesThisKanji = 0; }; $('#tryAgain').onclick = () => { completePracticeRound(); drawing.clear(); };
   $('#traceMode').onclick = () => setMode('trace'); $('#guidedMode').onclick = () => setMode('guided'); $('#freeMode').onclick = () => setMode('free');
