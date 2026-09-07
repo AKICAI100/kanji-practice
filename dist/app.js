@@ -14,27 +14,44 @@
   function saveLastIndex() {
     try { localStorage.setItem(LAST_POSITION_KEY, String(index)); } catch (_) {}
   }
-  let index = loadLastIndex(), mode = 'trace', strokesThisKanji = 0, soundEnabled = true, currentStroke = 0;
+  let index = loadLastIndex(), mode = 'trace', strokesThisKanji = 0, soundEnabled = true, currentStroke = 0, guidedInputStrokes = [];
   let readIndex = 0, testIndex = 0, testAnswered = false, readAnswered = false;
   const board = $('#drawingBoard');
-  const drawing = window.KanjiDrawing.createDrawingSurface($('#practiceCanvas'), () => {
+  const drawing = window.KanjiDrawing.createDrawingSurface($('#practiceCanvas'), inputStroke => {
     strokesThisKanji += 1;
-    if (mode === 'guided' && verifiedStrokePaths(data[index]).length) {
-      currentStroke = Math.min(currentStroke + 1, verifiedStrokePaths(data[index]).length - 1);
+    const paths = verifiedStrokePaths(data[index]);
+    if (mode === 'guided' && paths.length && currentStroke < paths.length) {
+      guidedInputStrokes.push(inputStroke);
+      currentStroke += 1;
       renderGuidedGuide(data[index]);
-      $('#strokeNotice').textContent = `Stroke ${currentStroke + 1} of ${verifiedStrokePaths(data[index]).length}`;
+      updateGuidedNotice(data[index]);
     }
   });
   const testDrawing = window.KanjiDrawing.createDrawingSurface($('#testWriting canvas'));
 
   function safe(value) { return value === null || value === undefined || value === '' ? '—' : value; }
-  function verifiedStrokePaths(item) {
-    if (Array.isArray(item.strokePaths)) return item.strokePaths;
-    if (Array.isArray(item.strokes)) return item.strokes;
-    return [];
+  function verifiedStrokeData(item) {
+    const local = window.KanjiVGStrokeData?.[item.kanji];
+    if (local && Array.isArray(local.paths)) return local;
+    if (Array.isArray(item.strokePaths)) return { paths: item.strokePaths, numbers: [] };
+    if (Array.isArray(item.strokes)) return { paths: item.strokes, numbers: [] };
+    return { paths: [], numbers: [] };
+  }
+  function verifiedStrokePaths(item) { return verifiedStrokeData(item).paths; }
+  function pathStart(pathData) {
+    const match = String(pathData).match(/^\s*[Mm]\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/);
+    return match ? { x: Number(match[1]), y: Number(match[2]) } : null;
+  }
+  function updateGuidedNotice(item) {
+    const paths = verifiedStrokePaths(item), notice = $('#strokeNotice');
+    board.classList.toggle('guided-complete', mode === 'guided' && paths.length > 0 && currentStroke >= paths.length);
+    if (item.kanji === '々') notice.textContent = 'Stroke guide not applicable for this symbol.';
+    else if (!paths.length) notice.textContent = 'Stroke guide not available.';
+    else if (currentStroke >= paths.length) notice.textContent = 'Great! Complete!';
+    else notice.textContent = `Stroke ${currentStroke + 1} of ${paths.length}`;
   }
   function renderGuidedGuide(item) {
-    const svg = $('#guidedStrokeGuide'), paths = verifiedStrokePaths(item);
+    const svg = $('#guidedStrokeGuide'), strokeData = verifiedStrokeData(item), paths = strokeData.paths;
     svg.replaceChildren();
     if (mode !== 'guided' || !paths.length) return;
     paths.forEach((pathData, strokeIndex) => {
@@ -42,8 +59,24 @@
       path.setAttribute('d', typeof pathData === 'string' ? pathData : pathData.path);
       path.classList.toggle('current', strokeIndex === currentStroke);
       path.classList.toggle('completed', strokeIndex < currentStroke);
+      path.classList.toggle('future', strokeIndex > currentStroke);
       svg.append(path);
     });
+    if (currentStroke < paths.length) {
+      const currentPath = typeof paths[currentStroke] === 'string' ? paths[currentStroke] : paths[currentStroke].path;
+      const start = pathStart(currentPath);
+      if (start) {
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        marker.setAttribute('cx', start.x); marker.setAttribute('cy', start.y); marker.setAttribute('r', '3.3'); marker.setAttribute('class', 'stroke-start');
+        svg.append(marker);
+      }
+      const numberPosition = strokeData.numbers?.[currentStroke];
+      if (numberPosition) {
+        const number = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        number.setAttribute('x', numberPosition.x); number.setAttribute('y', numberPosition.y); number.setAttribute('class', 'stroke-number');
+        number.textContent = String(currentStroke + 1); svg.append(number);
+      }
+    }
   }
   function itemStatus(kanji) { const p = progress.getItem(kanji); return p.learned ? 'Learned' : p.practices ? 'Practicing' : 'Not started'; }
   function updateStatus() {
@@ -54,11 +87,11 @@
   }
   function renderPractice(clear = true) {
     const item = data[index];
-    if (clear) drawing.clear(); strokesThisKanji = 0;
+    if (clear) drawing.clear(); strokesThisKanji = 0; guidedInputStrokes = [];
     saveLastIndex();
     $('#practicePosition').textContent = `${index + 1} / ${data.length}`;
     $('#kanjiGuide').textContent = item.kanji; $('#infoKanji').textContent = item.kanji;
-    currentStroke = 0; renderGuidedGuide(item);
+    currentStroke = 0; renderGuidedGuide(item); if (mode === 'guided') updateGuidedNotice(item);
     $('#infoMeaning').textContent = item.meaning; $('#infoMeaningLong').textContent = item.meaning;
     $('#infoOnyomi').textContent = safe(item.onyomi); $('#infoKunyomi').textContent = safe(item.kunyomi);
     $('#infoOnRomaji').textContent = safe(item.onRomaji); $('#infoKunRomaji').textContent = safe(item.kunRomaji);
@@ -105,12 +138,24 @@
   }
   function setMode(next) {
     completePracticeRound();
-    mode = next; currentStroke = 0;
+    mode = next; currentStroke = 0; guidedInputStrokes = [];
     board.classList.toggle('trace-mode', mode === 'trace'); board.classList.toggle('guided-mode', mode === 'guided'); board.classList.toggle('free-mode', mode === 'free');
     ['trace', 'guided', 'free'].forEach(name => { const button = $(`#${name}Mode`); const active = mode === name; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
     const paths = verifiedStrokePaths(data[index]);
-    $('#strokeNotice').textContent = mode === 'trace' ? 'Trace the pale kanji' : mode === 'free' ? 'Write it by yourself' : paths.length ? `Stroke 1 of ${paths.length}` : 'Stroke guide not available yet';
+    $('#strokeNotice').textContent = mode === 'trace' ? 'Trace the pale kanji' : 'Write it by yourself';
+    if (mode === 'guided') updateGuidedNotice(data[index]); else board.classList.remove('guided-complete');
+    $('#clearCanvas').textContent = mode === 'guided' ? '↻ Restart character' : '↻ Clear';
+    $('#tryAgain').textContent = mode === 'guided' ? '✨ Retry stroke' : '✨ Try Again';
     renderGuidedGuide(data[index]); drawing.clear();
+  }
+  function undoGuidedStroke() {
+    if (mode !== 'guided' || currentStroke === 0) return;
+    drawing.undo(); guidedInputStrokes.pop(); currentStroke -= 1; strokesThisKanji = Math.max(0, strokesThisKanji - 1);
+    renderGuidedGuide(data[index]); updateGuidedNotice(data[index]);
+  }
+  function restartGuidedCharacter() {
+    drawing.clear(); guidedInputStrokes = []; currentStroke = 0; strokesThisKanji = 0;
+    renderGuidedGuide(data[index]); updateGuidedNotice(data[index]);
   }
   function speak(item) {
     if (!soundEnabled || !('speechSynthesis' in window)) return;
@@ -162,7 +207,8 @@
   $('#homeButton').onclick = () => showView('home');
   $('#practicePosition').onclick = openJumpPanel; $('#closeJump').onclick = () => $('#jumpDialog').close();
   $('#previousKanji').onclick = () => moveKanji(-1); $('#nextKanjiTop').onclick = $('#nextKanji').onclick = () => moveKanji(1);
-  $('#clearCanvas').onclick = () => { drawing.clear(); strokesThisKanji = 0; }; $('#tryAgain').onclick = () => { completePracticeRound(); drawing.clear(); };
+  $('#clearCanvas').onclick = () => { if (mode === 'guided') restartGuidedCharacter(); else { drawing.clear(); strokesThisKanji = 0; } };
+  $('#tryAgain').onclick = () => { if (mode === 'guided') undoGuidedStroke(); else { completePracticeRound(); drawing.clear(); } };
   $('#traceMode').onclick = () => setMode('trace'); $('#guidedMode').onclick = () => setMode('guided'); $('#freeMode').onclick = () => setMode('free');
   $('#markLearned').onclick = () => { completePracticeRound(); progress.toggleLearned(data[index].kanji); updateStatus(); };
   $('#pronounceButton').onclick = () => speak(data[index]); $('#soundToggle').onclick = () => { soundEnabled = !soundEnabled; $('#soundToggle').firstChild.textContent = soundEnabled ? '🔊' : '🔇'; };

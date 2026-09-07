@@ -8,6 +8,8 @@ Kanji Garden is a child-friendly kanji learning web app for the 182 requested st
 - `style.css` — responsive iPhone/desktop design
 - `kanji-data.js` — ordered 182-item learning data
 - `tracing.js` — pointer/touch canvas drawing
+- `stroke-data/kanjivg-strokes.js` — local KanjiVG stroke paths and number positions
+- `tools/sync-kanjivg.mjs` — regenerates the local subset and coverage audit
 - `progress.js` — local progress storage
 - `app.js` — navigation, lessons, quizzes, and UI behavior
 - `assets/pig-mascot.svg` — original mascot artwork
@@ -24,6 +26,8 @@ Push these files to a GitHub repository. In **Settings → Pages**, select **Dep
 
 Practice counts, learned status, recent items, and quiz scores are saved in the browser with `localStorage` under `kanjiGardenProgress.v1`. Progress stays on that device/browser after the page is closed.
 
-## Stroke order
+## Stroke order and KanjiVG
 
-The app never invents stroke order. It provides a pale font guide and touch/mouse drawing for every item. The data model includes a reserved `strokes` field so a verified external stroke-order source can be connected later; until then, the Watch button clearly explains that verified stroke data is unavailable.
+Guided Strokes uses a local subset of [KanjiVG](https://kanjivg.tagaini.net/) so it works offline. KanjiVG is copyright © 2009–2026 Ulrich Apel and contributors and is released under the [Creative Commons Attribution-ShareAlike 3.0 Unported License](https://creativecommons.org/licenses/by-sa/3.0/). This attribution and license apply to the KanjiVG-derived files in `stroke-data/`; they do not change the license of unrelated Kanji Garden code or assets.
+
+After changing `kanji-data.js`, run `node tools/sync-kanjivg.mjs`. The script derives each filename from the character's Unicode code point, downloads only the required official SVG files, generates the local runtime subset, and writes `stroke-data/coverage.json`. It exits with an error when any ordinary kanji is unavailable. The iteration mark `々` is reported separately.

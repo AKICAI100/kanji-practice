@@ -1,12 +1,13 @@
 'use strict';
 
-const CACHE_NAME = 'kanji-garden-shell-v2';
+const CACHE_NAME = 'kanji-garden-shell-v4';
 const APP_SHELL = [
   './',
   './index.html',
   './style.css',
   './kanji-data.js',
   './progress.js',
+  './stroke-data/kanjivg-strokes.js',
   './tracing.js',
   './app.js',
   './pwa.js',

@@ -71,9 +71,9 @@
           <div id="drawingBoard" class="drawing-board trace-mode">
             <div class="guide-lines" aria-hidden="true"></div>
             <div id="kanjiGuide" class="kanji-guide" aria-hidden="true">四</div>
-            <svg id="guidedStrokeGuide" class="guided-stroke-guide" viewBox="0 0 109 109" aria-hidden="true"></svg>
+            <svg id="guidedStrokeGuide" class="guided-stroke-guide" viewBox="0 0 109 109" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
             <canvas id="practiceCanvas" aria-label="Draw the kanji here"></canvas>
-            <div id="strokeNotice" class="stroke-notice">Trace the pale kanji</div>
+            <div id="strokeNotice" class="stroke-notice" role="status" aria-live="polite">Trace the pale kanji</div>
           </div>
           <div class="board-actions">
             <button id="clearCanvas" class="secondary">↻ Clear</button>
@@ -134,10 +134,11 @@
     <div id="jumpGrid" class="jump-grid" aria-label="Kanji in selected range"></div>
   </dialog>
 
-  <dialog id="helpDialog"><button id="closeHelp" aria-label="Close help">×</button><h2>How to use Kanji Garden</h2><ol><li>Look at the pale kanji.</li><li>Trace it with your finger or mouse.</li><li>Try writing it without the guide.</li><li>Mark it learned when you feel ready.</li></ol><p>Stroke-order animation appears only when verified stroke data is available.</p></dialog>
+  <dialog id="helpDialog"><button id="closeHelp" aria-label="Close help">×</button><h2>How to use Kanji Garden</h2><ol><li>Use Trace to follow the whole pale kanji.</li><li>Use Guided Strokes to write one highlighted stroke at a time.</li><li>Use Write Freely when you are ready to try alone.</li><li>Mark it learned when you feel ready.</li></ol><p>Guided stroke-order data is provided by KanjiVG (CC BY-SA 3.0).</p></dialog>
 
   <script src="kanji-data.js"></script>
   <script src="progress.js"></script>
+  <script src="stroke-data/kanjivg-strokes.js"></script>
   <script src="tracing.js"></script>
   <script src="app.js"></script>
   <script src="pwa.js"></script>
