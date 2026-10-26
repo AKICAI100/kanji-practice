@@ -26,9 +26,13 @@
     }
     function resize() {
       const rect = canvas.getBoundingClientRect();
+      // Hidden tabs have a zero-size rectangle. Never resize the canvas to 0.
+      // ResizeObserver will call resize again when the tab becomes visible.
+      if (rect.width <= 0 || rect.height <= 0) return;
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(rect.height * ratio);
-      canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`;
+      // Keep layout dimensions in CSS. Inline pixel sizes can lock the canvas
+      // at 0px after switching between Practice, Progress, and other tabs.
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#26344a'; ctx.lineWidth = Math.max(8, rect.width * .026);
       redraw();
     }
